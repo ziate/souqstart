@@ -22,7 +22,7 @@ class ProfileProvider extends ChangeNotifier {
   String _addressType = '';
   UserInfoModel _userInfoModel;
   bool _isLoading = false;
-  List<AddressModel> _addressList =[];
+  List<AddressModel> _addressList = [];
   List<AddressModel> _billingAddressList = [];
   List<AddressModel> _shippingAddressList = [];
   bool _hasData;
@@ -50,11 +50,11 @@ class ProfileProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool _checkHomeAddress=false;
-  bool get checkHomeAddress=>_checkHomeAddress;
+  bool _checkHomeAddress = false;
+  bool get checkHomeAddress => _checkHomeAddress;
 
-  bool _checkOfficeAddress=false;
-  bool get checkOfficeAddress=>_checkOfficeAddress;
+  bool _checkOfficeAddress = false;
+  bool get checkOfficeAddress => _checkOfficeAddress;
 
   void setHomeAddress() {
     _checkHomeAddress = true;
@@ -68,33 +68,34 @@ class ProfileProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-
   updateCountryCode(String value) {
     _addressType = value;
     notifyListeners();
   }
 
   Future<void> initAddressList(BuildContext context) async {
+    _isLoading = true;
     ApiResponse apiResponse = await profileRepo.getAllAddress();
-    if (apiResponse.response != null && apiResponse.response.statusCode == 200) {
+    if (apiResponse.response != null &&
+        apiResponse.response.statusCode == 200) {
       _addressList = [];
-      _billingAddressList =[];
-      _shippingAddressList =[];
+      _billingAddressList = [];
+      _shippingAddressList = [];
       apiResponse.response.data.forEach((address) {
         AddressModel addressModel = AddressModel.fromJson(address);
-        if(addressModel.isBilling == 1){
+        if (addressModel.isBilling == 1) {
           _billingAddressList.add(addressModel);
-        }else if(addressModel.isBilling == 0){
+        } else if (addressModel.isBilling == 0) {
           _addressList.add(addressModel);
         }
         _shippingAddressList.add(addressModel);
-
-
       });
       // apiResponse.response.data.forEach((address) => _addressList.add(AddressModel.fromJson(address)));
     } else {
       ApiChecker.checkApi(context, apiResponse);
     }
+    _isLoading = false;
+
     notifyListeners();
   }
 
@@ -102,14 +103,16 @@ class ProfileProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     ApiResponse apiResponse = await profileRepo.removeAddressByID(id);
-    if (apiResponse.response != null && apiResponse.response.statusCode == 200) {
+    if (apiResponse.response != null &&
+        apiResponse.response.statusCode == 200) {
       _addressList.removeAt(index);
       Map map = apiResponse.response.data;
       String message = map["message"];
       initAddressList(context);
       Provider.of<OrderProvider>(context, listen: false).shippingAddressNull();
       Provider.of<OrderProvider>(context, listen: false).billingAddressNull();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message), backgroundColor: Colors.green));
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message), backgroundColor: Colors.green));
 
       _isLoading = false;
     } else {
@@ -122,7 +125,8 @@ class ProfileProvider extends ChangeNotifier {
   Future<String> getUserInfo(BuildContext context) async {
     String userID = '-1';
     ApiResponse apiResponse = await profileRepo.getUserInfo();
-    if (apiResponse.response != null && apiResponse.response.statusCode == 200) {
+    if (apiResponse.response != null &&
+        apiResponse.response.statusCode == 200) {
       _userInfoModel = UserInfoModel.fromJson(apiResponse.response.data);
       userID = _userInfoModel.id.toString();
     } else {
@@ -135,7 +139,8 @@ class ProfileProvider extends ChangeNotifier {
   void initAddressTypeList(BuildContext context) async {
     if (_addressTypeList.length == 0) {
       ApiResponse apiResponse = await profileRepo.getAddressTypeList();
-      if (apiResponse.response != null && apiResponse.response.statusCode == 200) {
+      if (apiResponse.response != null &&
+          apiResponse.response.statusCode == 200) {
         _addressTypeList.clear();
         _addressTypeList.addAll(apiResponse.response.data);
         _addressType = apiResponse.response.data[0];
@@ -153,9 +158,10 @@ class ProfileProvider extends ChangeNotifier {
     ApiResponse apiResponse = await profileRepo.addAddress(addressModel);
     _isLoading = false;
 
-    if (apiResponse.response != null && apiResponse.response.statusCode == 200) {
+    if (apiResponse.response != null &&
+        apiResponse.response.statusCode == 200) {
       Map map = apiResponse.response.data;
-      if(_addressList == null) {
+      if (_addressList == null) {
         _addressList = [];
       }
       _addressList.add(addressModel);
@@ -176,12 +182,14 @@ class ProfileProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<ResponseModel> updateUserInfo(UserInfoModel updateUserModel, String pass, File file, String token) async {
+  Future<ResponseModel> updateUserInfo(UserInfoModel updateUserModel,
+      String pass, File file, String token) async {
     _isLoading = true;
     notifyListeners();
 
     ResponseModel responseModel;
-    http.StreamedResponse response = await profileRepo.updateProfile(updateUserModel, pass, file, token);
+    http.StreamedResponse response =
+        await profileRepo.updateProfile(updateUserModel, pass, file, token);
     _isLoading = false;
     if (response.statusCode == 200) {
       Map map = jsonDecode(await response.stream.bytesToString());
@@ -191,7 +199,8 @@ class ProfileProvider extends ChangeNotifier {
       print(message);
     } else {
       print('${response.statusCode} ${response.reasonPhrase}');
-      responseModel = ResponseModel('${response.statusCode} ${response.reasonPhrase}', false);
+      responseModel = ResponseModel(
+          '${response.statusCode} ${response.reasonPhrase}', false);
     }
     notifyListeners();
     return responseModel;
