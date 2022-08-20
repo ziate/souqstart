@@ -19,6 +19,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 
+import '../../../helper/locator_helper.dart';
+
 class AddNewAddressScreen extends StatefulWidget {
   final bool isEnableUpdate;
   final bool fromCheckout;
@@ -52,10 +54,16 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
   CameraPosition _cameraPosition;
   bool _updateAddress = true;
   Address _address;
-
+  Position currentPosition;
   @override
   void initState() {
     super.initState();
+
+    // LocatorHelper.determinePosition().then((position) {
+    //   setState(() {
+    //     this.currentPosition = position;
+    //   });
+    // });
     _controller = widget.mapController;
     _address = Address.shipping;
 
@@ -175,7 +183,15 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
                                             clipBehavior: Clip.none,
                                             children: [
                                               GoogleMap(
+                                                myLocationEnabled: true,
                                                 mapType: MapType.normal,
+                                                // initialCameraPosition:
+                                                //     CameraPosition(
+                                                //   target: LatLng(
+                                                //     currentPosition.latitude,
+                                                //     currentPosition.longitude,
+                                                //   ),
+                                                // ),
                                                 initialCameraPosition:
                                                     CameraPosition(
                                                   target: widget.isEnableUpdate
@@ -208,6 +224,13 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
                                                 },
                                                 zoomControlsEnabled: false,
                                                 compassEnabled: false,
+                                                onMapCreated: (v) {
+                                                  locationProvider
+                                                      .getCurrentLocation(
+                                                          context, true,
+                                                          mapController:
+                                                              _controller);
+                                                },
                                                 indoorViewEnabled: true,
                                                 mapToolbarEnabled: false,
                                                 onCameraIdle: () {
@@ -251,19 +274,20 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
                                                                   .primaryColor)))
                                                   : SizedBox(),
                                               Container(
-                                                  width: MediaQuery.of(context)
-                                                      .size
-                                                      .width,
-                                                  alignment: Alignment.center,
-                                                  height: MediaQuery.of(context)
-                                                      .size
-                                                      .height,
-                                                  child: Icon(
-                                                    Icons.location_on,
-                                                    size: 40,
-                                                    color: Theme.of(context)
-                                                        .primaryColor,
-                                                  )),
+                                                width: MediaQuery.of(context)
+                                                    .size
+                                                    .width,
+                                                alignment: Alignment.center,
+                                                height: MediaQuery.of(context)
+                                                    .size
+                                                    .height,
+                                                child: Icon(
+                                                  Icons.location_on,
+                                                  size: 40,
+                                                  color: Theme.of(context)
+                                                      .primaryColor,
+                                                ),
+                                              ),
                                               Positioned(
                                                 bottom: 10,
                                                 right: 0,
@@ -722,6 +746,29 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
                                   onTap: locationProvider.loading
                                       ? null
                                       : () {
+                                          if (_contactPersonNameController.text
+                                              .trim()
+                                              .isEmpty) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(SnackBar(
+                                                    content: Text(
+                                                        "من فضلك أدخل اسم المستلم"),
+                                                    backgroundColor:
+                                                        ColorResources.RED));
+                                          }
+
+                                          if (_contactPersonNumberController
+                                              .text
+                                              .trim()
+                                              .isEmpty) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(SnackBar(
+                                                    content: Text(
+                                                        "من فضلك أدخل رقم المستلم"),
+                                                    backgroundColor:
+                                                        ColorResources.RED));
+                                          }
+
                                           AddressModel addressModel =
                                               AddressModel(
                                             addressType: locationProvider
