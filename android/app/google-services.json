@@ -122,6 +122,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "1082972567264-5oattd2f5utvik3s7nfalprh3i9v23i0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.souqadam.vendor",
+            "certificate_hash": "1bc0cdb5ef3cdc0e9412769cad933766743f52d3"
+          }
+        },
+        {
           "client_id": "1082972567264-fqhrs6lmcohs431v3fjsn2si0ocm22lv.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
