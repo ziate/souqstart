@@ -95,6 +95,11 @@ class _SelectLocationScreenState extends State<SelectLocationScreen> {
                           // markers: Set<Marker>.of(locationProvider.markers),
                           onMapCreated: (GoogleMapController controller) {
                             _controller = controller;
+                            locationProvider.getCurrentLocation(
+                              context,
+                              true,
+                              mapController: _controller,
+                            );
                           },
                         ),
                         locationProvider.pickAddress != null

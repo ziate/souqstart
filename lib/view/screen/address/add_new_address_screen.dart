@@ -755,6 +755,7 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
                                                         "من فضلك أدخل اسم المستلم"),
                                                     backgroundColor:
                                                         ColorResources.RED));
+                                            return;
                                           }
 
                                           if (_contactPersonNumberController
@@ -767,6 +768,7 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
                                                         "من فضلك أدخل رقم المستلم"),
                                                     backgroundColor:
                                                         ColorResources.RED));
+                                            return;
                                           }
 
                                           AddressModel addressModel =

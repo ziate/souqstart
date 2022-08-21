@@ -86,7 +86,7 @@ class ProductWidget extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.only(
                   top: Dimensions.PADDING_SIZE_SMALL,
-                  bottom: 5,
+                  // bottom: 5,
                   left: 5,
                   right: 5,
                 ),
@@ -115,20 +115,10 @@ class ProductWidget extends StatelessWidget {
                           )),
                     ]),
                     SizedBox(height: Dimensions.PADDING_SIZE_EXTRA_SMALL),
-                    productModel.discount != null && productModel.discount > 0
-                        ? Text(
-                            PriceConverter.convertPrice(
-                                context, productModel.unitPrice),
-                            style: titleRegular.copyWith(
-                              color: ColorResources.getRed(context),
-                              decoration: TextDecoration.lineThrough,
-                              fontSize: Dimensions.FONT_SIZE_EXTRA_LARGE,
-                            ),
-                          )
-                        : SizedBox.shrink(),
-                    SizedBox(
-                      height: 2,
-                    ),
+
+                    // SizedBox(
+                    //   height: 2,
+                    // ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
@@ -148,12 +138,13 @@ class ProductWidget extends StatelessWidget {
                                           isError: false);
                                     }));
                           },
-                          child: Icon(Icons.add_shopping_cart_sharp,
-                              color:
-                                  Provider.of<ThemeProvider>(context).darkTheme
-                                      ? Colors.white
-                                      : Colors.orange,
-                              size: 25),
+                          child: Icon(
+                            Icons.add_shopping_cart_sharp,
+                            color: Provider.of<ThemeProvider>(context).darkTheme
+                                ? Colors.white
+                                : Colors.orange,
+                            size: 25,
+                          ),
                         ),
                         // SizedBox(height: 100),
                         Text(
@@ -167,6 +158,17 @@ class ProductWidget extends StatelessWidget {
                         ),
                       ],
                     ),
+                    productModel.discount != null && productModel.discount > 0
+                        ? Text(
+                            PriceConverter.convertPrice(
+                                context, productModel.unitPrice),
+                            style: titleRegular.copyWith(
+                              color: ColorResources.getRed(context),
+                              decoration: TextDecoration.lineThrough,
+                              fontSize: Dimensions.FONT_SIZE_LARGE,
+                            ),
+                          )
+                        : SizedBox.shrink(),
                   ],
                 ),
               ),

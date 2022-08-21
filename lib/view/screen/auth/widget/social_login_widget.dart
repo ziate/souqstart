@@ -19,145 +19,230 @@ class SocialLoginWidget extends StatefulWidget {
 }
 
 class _SocialLoginWidgetState extends State<SocialLoginWidget> {
-
   SocialLoginModel socialLogin = SocialLoginModel();
-  route(bool isRoute, String token, String temporaryToken, String errorMessage) async {
+  route(bool isRoute, String token, String temporaryToken,
+      String errorMessage) async {
     if (isRoute) {
-      if(token != null){
-        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => DashBoardScreen()), (route) => false);
-
-      }else if(temporaryToken != null && temporaryToken.isNotEmpty){
-        if(Provider.of<SplashProvider>(context,listen: false).configModel.emailVerification){
-          Provider.of<AuthProvider>(context, listen: false).checkEmail(socialLogin.email.toString(),temporaryToken).then((value) async {
+      if (token != null) {
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (_) => DashBoardScreen()),
+            (route) => false);
+      } else if (temporaryToken != null && temporaryToken.isNotEmpty) {
+        if (Provider.of<SplashProvider>(context, listen: false)
+            .configModel
+            .emailVerification) {
+          Provider.of<AuthProvider>(context, listen: false)
+              .checkEmail(socialLogin.email.toString(), temporaryToken)
+              .then((value) async {
             if (value.isSuccess) {
-              Provider.of<AuthProvider>(context, listen: false).updateEmail(socialLogin.email.toString());
-              Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => VerificationScreen(temporaryToken,'',socialLogin.email.toString())), (route) => false);
-
+              Provider.of<AuthProvider>(context, listen: false)
+                  .updateEmail(socialLogin.email.toString());
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => VerificationScreen(
+                          temporaryToken, '', socialLogin.email.toString())),
+                  (route) => false);
             }
           });
         }
-        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => MobileVerificationScreen(temporaryToken)), (route) => false);
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+                builder: (_) => MobileVerificationScreen(temporaryToken)),
+            (route) => false);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(errorMessage), backgroundColor: Colors.red));
       }
-      else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(errorMessage), backgroundColor: Colors.red));
-      }
-
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(errorMessage), backgroundColor: Colors.red));
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(errorMessage), backgroundColor: Colors.red));
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Provider.of<SplashProvider>(context,listen: false).configModel.socialLogin[0].status?
-       Provider.of<SplashProvider>(context,listen: false).configModel.socialLogin[1].status?
-        Center(child: Text(getTranslated('social_login', context)))
-        :Center(child: Text(getTranslated('social_login', context))):SizedBox(),
-        Container(color: Provider.of<ThemeProvider>(context).darkTheme ? Theme.of(context).canvasColor : Colors.transparent,
-          child: Row(
+        Provider.of<SplashProvider>(context, listen: false)
+                .configModel
+                .socialLogin[0]
+                .status
+            ? Provider.of<SplashProvider>(context, listen: false)
+                    .configModel
+                    .socialLogin[1]
+                    .status
+                ? Center(child: Text(getTranslated('social_login', context)))
+                : Center(child: Text(getTranslated('social_login', context)))
+            : SizedBox(),
+        Container(
+          color: Provider.of<ThemeProvider>(context).darkTheme
+              ? Theme.of(context).canvasColor
+              : Colors.transparent,
+          child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-             Provider.of<SplashProvider>(context,listen: false).configModel.socialLogin[0].status?
+              Provider.of<SplashProvider>(context, listen: false)
+                      .configModel
+                      .socialLogin[0]
+                      .status
+                  ? InkWell(
+                      onTap: () async {
+                        await Provider.of<GoogleSignInProvider>(context,
+                                listen: false)
+                            .login();
+                        String id, token, email, medium;
+                        if (Provider.of<GoogleSignInProvider>(context,
+                                    listen: false)
+                                .googleAccount !=
+                            null) {
+                          id = Provider.of<GoogleSignInProvider>(context,
+                                  listen: false)
+                              .googleAccount
+                              .id;
+                          email = Provider.of<GoogleSignInProvider>(context,
+                                  listen: false)
+                              .googleAccount
+                              .email;
+                          token = Provider.of<GoogleSignInProvider>(context,
+                                  listen: false)
+                              .auth
+                              .accessToken;
+                          medium = 'google';
 
-              InkWell(
-                onTap: () async{
-
-                  await Provider.of<GoogleSignInProvider>(context, listen: false).login();
-                  String id,token,email, medium;
-                  if(Provider.of<GoogleSignInProvider>(context,listen: false).googleAccount != null){
-                    id = Provider.of<GoogleSignInProvider>(context,listen: false).googleAccount.id;
-                    email = Provider.of<GoogleSignInProvider>(context,listen: false).googleAccount.email;
-                    token = Provider.of<GoogleSignInProvider>(context,listen: false).auth.accessToken;
-                    medium = 'google';
-
-                    socialLogin.email = email;
-                    socialLogin.medium = medium;
-                    socialLogin.token = token;
-                    socialLogin.uniqueId = id;
-                    print('===>info ===> $email   ====> $medium ====> $token   ==>$id');
-                    await Provider.of<AuthProvider>(context, listen: false).socialLogin(socialLogin, route);
-
-
-                  }
-
-                },
-                child: Ink(
-                  color: Color(0xFF397AF3),
-                  child: Padding(
-                    padding: EdgeInsets.all(6),
-                    child: Card(
-                      // color: Color(0xFF397AF3),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Wrap(
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          children: [
-                            Container(
-                                decoration: BoxDecoration(
-                                    color: Colors.white ,
-                                    borderRadius: BorderRadius.all(Radius.circular(5))
+                          socialLogin.email = email;
+                          socialLogin.medium = medium;
+                          socialLogin.token = token;
+                          socialLogin.uniqueId = id;
+                          print(
+                              '===>info ===> $email   ====> $medium ====> $token   ==>$id');
+                          await Provider.of<AuthProvider>(context,
+                                  listen: false)
+                              .socialLogin(socialLogin, route);
+                        }
+                      },
+                      child: Container(
+                        width: 300,
+                        // color: Color(0xFF397AF3),
+                        child: Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(6),
+                            child: Card(
+                              // color: Color(0xFF397AF3),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text("تسجيل الدخول بواسطة جوجل"),
+                                    SizedBox(width: 10),
+                                    Wrap(
+                                      crossAxisAlignment:
+                                          WrapCrossAlignment.center,
+                                      children: [
+                                        Container(
+                                            decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(5))),
+                                            height: 30,
+                                            width: 30,
+                                            child: Image.asset(Images
+                                                .google)), // <-- Use 'Image.asset(...)' here
+                                        // SizedBox(width: 12),
+                                        // Padding(
+                                        //   padding: const EdgeInsets.fromLTRB(0,8,8,8),
+                                        //   child: Text('Google',maxLines: 2, style: TextStyle(color: Colors.white),),
+                                        // ),
+                                      ],
+                                    ),
+                                  ].reversed.toList(),
                                 ),
-                                height: 30,width: 30,
-                                child: Image.asset(Images.google)), // <-- Use 'Image.asset(...)' here
-                            // SizedBox(width: 12),
-                            // Padding(
-                            //   padding: const EdgeInsets.fromLTRB(0,8,8,8),
-                            //   child: Text('Google',maxLines: 2, style: TextStyle(color: Colors.white),),
-                            // ),
-                          ],
+                              ),
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-                ),
-              ) :SizedBox(),
+                    )
+                  : SizedBox(),
+              Provider.of<SplashProvider>(context, listen: false)
+                      .configModel
+                      .socialLogin[1]
+                      .status
+                  ? InkWell(
+                      onTap: () async {
+                        await Provider.of<FacebookLoginProvider>(context,
+                                listen: false)
+                            .login();
 
-              Provider.of<SplashProvider>(context,listen: false).configModel.socialLogin[1].status?
-              InkWell(
-                onTap: () async{
-                  await Provider.of<FacebookLoginProvider>(context, listen: false).login();
+                        String id, token, email, medium;
+                        if (Provider.of<FacebookLoginProvider>(context,
+                                    listen: false)
+                                .userData !=
+                            null) {
+                          id = Provider.of<FacebookLoginProvider>(context,
+                                  listen: false)
+                              .result
+                              .accessToken
+                              .userId;
+                          email = Provider.of<FacebookLoginProvider>(context,
+                                  listen: false)
+                              .userData['email'];
+                          token = Provider.of<FacebookLoginProvider>(context,
+                                  listen: false)
+                              .result
+                              .accessToken
+                              .token;
+                          medium = 'facebook';
 
-                  String id,token,email, medium;
-                  if(Provider.of<FacebookLoginProvider>(context,listen: false).userData != null){
-                    id = Provider.of<FacebookLoginProvider>(context,listen: false).result.accessToken.userId;
-                    email = Provider.of<FacebookLoginProvider>(context,listen: false).userData['email'];
-                    token = Provider.of<FacebookLoginProvider>(context,listen: false).result.accessToken.token;
-                    medium = 'facebook';
+                          socialLogin.email = email;
+                          socialLogin.medium = medium;
+                          socialLogin.token = token;
+                          socialLogin.uniqueId = id;
+                          print(
+                              '===>info ===> $email   ====> $medium ====> $token   ==>$id');
 
-                    socialLogin.email = email;
-                    socialLogin.medium = medium;
-                    socialLogin.token = token;
-                    socialLogin.uniqueId = id;
-                    print('===>info ===> $email   ====> $medium ====> $token   ==>$id');
-
-                    await Provider.of<AuthProvider>(context, listen: false).socialLogin(socialLogin, route);
-
-                  }
-
-                },
-                child: Ink(
-                  color: Color(0xFF397AF3),
-                  child: Padding(
-                    padding: EdgeInsets.all(6),
-                    child: Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Wrap(
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          children: [
-                            Container(height: 30,width: 30,
-                                child: Image.asset(Images.facebook)), // <-- Use 'Image.asset(...)' here
-                            // SizedBox(width: 8),
-                            // Text('Facebook',maxLines: 2,),
-                          ],
+                          await Provider.of<AuthProvider>(context,
+                                  listen: false)
+                              .socialLogin(socialLogin, route);
+                        }
+                      },
+                      child: Container(
+                        width: 300,
+                        // color: Color(0xFF397AF3),
+                        child: Padding(
+                          padding: EdgeInsets.all(6),
+                          child: Card(
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text("تسجيل الدخول بواسطة فيسبوك"),
+                                  SizedBox(width: 10),
+                                  Wrap(
+                                    crossAxisAlignment:
+                                        WrapCrossAlignment.center,
+                                    children: [
+                                      Container(
+                                          height: 30,
+                                          width: 30,
+                                          child: Image.asset(Images
+                                              .facebook)), // <-- Use 'Image.asset(...)' here
+                                      // SizedBox(width: 8),
+                                      // Text('Facebook',maxLines: 2,),
+                                    ],
+                                  ),
+                                ].reversed.toList(),
+                              ),
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-                ),
-              ):SizedBox(),
-
+                    )
+                  : SizedBox(),
             ],
           ),
         ),

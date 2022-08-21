@@ -6,6 +6,7 @@ import 'package:flutter_sixvalley_ecommerce/utill/color_resources.dart';
 import 'package:flutter_sixvalley_ecommerce/utill/dimensions.dart';
 import 'package:flutter_sixvalley_ecommerce/view/basewidget/no_internet_screen.dart';
 import 'package:flutter_sixvalley_ecommerce/view/screen/address/widget/address_list_screen.dart';
+import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 
@@ -25,14 +26,14 @@ class _SavedAddressListScreenState extends State<SavedAddressListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.of(context).push(MaterialPageRoute(
-              builder: (BuildContext context) => SelectLocationScreen()));
-        },
-        child: Icon(Icons.add, color: Theme.of(context).highlightColor),
-        backgroundColor: ColorResources.getPrimary(context),
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () {
+      //     Navigator.of(context).push(MaterialPageRoute(
+      //         builder: (BuildContext context) => SelectLocationScreen()));
+      //   },
+      //   child: Icon(Icons.add, color: Theme.of(context).highlightColor),
+      //   backgroundColor: ColorResources.getPrimary(context),
+      // ),
       appBar: AppBar(
         title: Text(getTranslated('SHIPPING_ADDRESS_LIST', context)),
       ),
@@ -99,6 +100,30 @@ class _SavedAddressListScreenState extends State<SavedAddressListScreen> {
           );
         },
       )),
+      bottomNavigationBar: InkWell(
+        onTap: () => Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (BuildContext context) => SelectLocationScreen(),
+          ),
+        ),
+        child: Container(
+          margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+          padding: EdgeInsets.all(8),
+          height: 50,
+          child: Center(
+            child: Text(
+              "أضغط هنا لإضافة عنوان".tr,
+              style: TextStyle(color: Colors.white, fontSize: 18),
+            ),
+          ),
+          decoration: BoxDecoration(
+            color: Theme.of(context).primaryColor,
+            borderRadius: BorderRadius.all(
+              Radius.circular(20),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
