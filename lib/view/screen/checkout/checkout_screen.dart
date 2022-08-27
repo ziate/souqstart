@@ -352,9 +352,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                     horizontal: Dimensions.PADDING_SIZE_LARGE,
                                     vertical: Dimensions.PADDING_SIZE_DEFAULT),
                                 decoration: BoxDecoration(
-                                  color: ColorResources.getPrimary(context),
-                                  borderRadius:BorderRadius.only(topLeft: Radius.circular(15),topRight: Radius.circular(15))
-                                ),
+                                    color: ColorResources.getPrimary(context),
+                                    borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(15),
+                                        topRight: Radius.circular(15))),
                                 child: Center(
                                   child: Text(getTranslated('proceed', context),
                                       style: titilliumSemiBold.copyWith(
