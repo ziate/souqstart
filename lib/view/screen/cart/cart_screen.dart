@@ -5,6 +5,7 @@ import 'package:flutter_sixvalley_ecommerce/helper/price_converter.dart';
 import 'package:flutter_sixvalley_ecommerce/localization/language_constrants.dart';
 import 'package:flutter_sixvalley_ecommerce/provider/auth_provider.dart';
 import 'package:flutter_sixvalley_ecommerce/provider/cart_provider.dart';
+import 'package:flutter_sixvalley_ecommerce/provider/profile_provider.dart';
 import 'package:flutter_sixvalley_ecommerce/provider/splash_provider.dart';
 import 'package:flutter_sixvalley_ecommerce/utill/color_resources.dart';
 import 'package:flutter_sixvalley_ecommerce/utill/custom_themes.dart';
@@ -40,6 +41,7 @@ class _CartScreenState extends State<CartScreen> {
       Provider.of<CartProvider>(context, listen: false).loadCities();
       Provider.of<CartProvider>(context, listen: false)
           .getShippingFeeFromProvider();
+      Provider.of<ProfileProvider>(context).initAddressList(context);
 
       if (Provider.of<SplashProvider>(context, listen: false)
               .configModel

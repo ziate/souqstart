@@ -26,7 +26,7 @@ class OrderProvider with ChangeNotifier {
   List<OrderModel> _pendingList;
   List<OrderModel> _deliveredList;
   List<OrderModel> _canceledList;
-  int _addressIndex;
+  int _addressIndex = 0;
   int _totalAmount;
   int _billingAddressIndex;
   double _freeShippingPrice;
@@ -120,12 +120,12 @@ class OrderProvider with ChangeNotifier {
     _orderDetails = null;
     notifyListeners();
     ApiResponse apiResponse =
-    await orderRepo.getOrderDetails(orderID, languageCode);
+        await orderRepo.getOrderDetails(orderID, languageCode);
     if (apiResponse.response != null &&
         apiResponse.response.statusCode == 200) {
       _orderDetails = [];
       apiResponse.response.data.forEach(
-              (order) => _orderDetails.add(OrderDetailsModel.fromJson(order)));
+          (order) => _orderDetails.add(OrderDetailsModel.fromJson(order)));
     } else {
       ApiChecker.checkApi(context, apiResponse);
     }
@@ -165,17 +165,17 @@ class OrderProvider with ChangeNotifier {
   // }
 
   Future<void> placeOrder(
-      OrderPlaceModel orderPlaceModel,
-      Function callback,
-      List<CartModel> cartList,
-      String addressID,
-      String couponCode,
-      String billingAddressId,
-      String orderNote,
-      BuildContext context,
+    OrderPlaceModel orderPlaceModel,
+    Function callback,
+    List<CartModel> cartList,
+    String addressID,
+    String couponCode,
+    String billingAddressId,
+    String orderNote,
+    BuildContext context,
 
-      //int totalAmount,
-      ) async {
+    //int totalAmount,
+  ) async {
     _isLoading = true;
     notifyListeners();
     ApiResponse apiResponse = await orderRepo.placeOrder(
@@ -187,8 +187,8 @@ class OrderProvider with ChangeNotifier {
     _isLoading = false;
     if (apiResponse.response != null &&
         apiResponse.response.statusCode == 200) {
-      _addressIndex = null;
-      _billingAddressIndex = null;
+      _addressIndex = 0;
+      _billingAddressIndex = 0;
       String message = apiResponse.response.data.toString();
       callback(true, message, '', cartList, false);
     } else if (apiResponse.response != null &&

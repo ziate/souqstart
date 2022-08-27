@@ -131,198 +131,181 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               return Scaffold(
                 resizeToAvoidBottomInset: true,
                 key: _scaffoldKey,
-                bottomNavigationBar: Container(
-                  height: 60,
-                  padding: EdgeInsets.symmetric(
-                      horizontal: Dimensions.PADDING_SIZE_LARGE,
-                      vertical: Dimensions.PADDING_SIZE_DEFAULT),
-                  decoration: BoxDecoration(
-                    color: ColorResources.getPrimary(context),
-                  ),
-                  child: Center(
-                    child: Consumer<OrderProvider>(
-                      builder: (context, order, child) {
-                        return !Provider.of<OrderProvider>(context).isLoading
-                            ? Builder(
-                                builder: (context) => InkWell(
-                                  onTap: () async {
-                                    //_loadData();
-                                    // print('------------------------------------${_order +
-                                    //     // widget.shippingFee -
-                                    //     widget.discount - TEST + widget.tax}----------------');
-                                    if (Provider.of<OrderProvider>(context,
+                bottomNavigationBar: Consumer<OrderProvider>(
+                  builder: (context, order, child) {
+                    return !Provider.of<OrderProvider>(context).isLoading
+                        ? Builder(
+                            builder: (context) => InkWell(
+                              onTap: () async {
+                                //_loadData();
+                                // print('------------------------------------${_order +
+                                //     // widget.shippingFee -
+                                //     widget.discount - TEST + widget.tax}----------------');
+                                if (Provider.of<OrderProvider>(context,
+                                            listen: false)
+                                        .addressIndex ==
+                                    null) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                          content: Text(getTranslated(
+                                              'select_a_shipping_address',
+                                              context)),
+                                          backgroundColor: Colors.red));
+                                } else if (Provider.of<OrderProvider>(context,
                                                 listen: false)
-                                            .addressIndex ==
-                                        null) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(SnackBar(
-                                              content: Text(getTranslated(
-                                                  'select_a_shipping_address',
-                                                  context)),
-                                              backgroundColor: Colors.red));
-                                    } else if (Provider.of<OrderProvider>(
-                                                    context,
+                                            .billingAddressIndex ==
+                                        null &&
+                                    _billingAddress) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                          content: Text(getTranslated(
+                                              'select_a_billing_address',
+                                              context)),
+                                          backgroundColor: Colors.red));
+                                } else {
+                                  List<CartModel> _cartList = [];
+                                  _cartList.addAll(widget.cartList);
+
+                                  for (int index = 0;
+                                      index < widget.cartList.length;
+                                      index++) {
+                                    for (int i = 0;
+                                        i <
+                                            Provider.of<CartProvider>(context,
                                                     listen: false)
-                                                .billingAddressIndex ==
-                                            null &&
-                                        _billingAddress) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(SnackBar(
-                                              content: Text(getTranslated(
-                                                  'select_a_billing_address',
-                                                  context)),
-                                              backgroundColor: Colors.red));
-                                    } else {
-                                      List<CartModel> _cartList = [];
-                                      _cartList.addAll(widget.cartList);
-
-                                      for (int index = 0;
-                                          index < widget.cartList.length;
-                                          index++) {
-                                        for (int i = 0;
-                                            i <
-                                                Provider.of<CartProvider>(
-                                                        context,
-                                                        listen: false)
-                                                    .chosenShippingList
-                                                    .length;
-                                            i++) {
-                                          if (Provider.of<CartProvider>(context,
-                                                      listen: false)
-                                                  .chosenShippingList[i]
-                                                  .cartGroupId ==
-                                              widget.cartList[index]
-                                                  .cartGroupId) {
-                                            _cartList[index].shippingMethodId =
-                                                Provider.of<CartProvider>(
-                                                        context,
-                                                        listen: false)
-                                                    .chosenShippingList[i]
-                                                    .id;
-                                            break;
-                                          }
-                                        }
+                                                .chosenShippingList
+                                                .length;
+                                        i++) {
+                                      if (Provider.of<CartProvider>(context,
+                                                  listen: false)
+                                              .chosenShippingList[i]
+                                              .cartGroupId ==
+                                          widget.cartList[index].cartGroupId) {
+                                        _cartList[index].shippingMethodId =
+                                            Provider.of<CartProvider>(context,
+                                                    listen: false)
+                                                .chosenShippingList[i]
+                                                .id;
+                                        break;
                                       }
+                                    }
+                                  }
 
-                                      String orderNote =
-                                          _orderNoteController.text.trim();
-                                      double couponDiscount =
-                                          Provider.of<CouponProvider>(context,
-                                                          listen: false)
-                                                      .discount !=
-                                                  null
-                                              ? Provider.of<CouponProvider>(
-                                                      context,
+                                  String orderNote =
+                                      _orderNoteController.text.trim();
+                                  double couponDiscount =
+                                      Provider.of<CouponProvider>(context,
                                                       listen: false)
-                                                  .discount
-                                              : 0;
-                                      String couponCode =
-                                          Provider.of<CouponProvider>(context,
-                                                          listen: false)
-                                                      .discount !=
-                                                  null
-                                              ? Provider.of<CouponProvider>(
-                                                      context,
+                                                  .discount !=
+                                              null
+                                          ? Provider.of<CouponProvider>(context,
+                                                  listen: false)
+                                              .discount
+                                          : 0;
+                                  String couponCode =
+                                      Provider.of<CouponProvider>(context,
                                                       listen: false)
-                                                  .coupon
-                                                  .code
-                                              : '';
-                                      if (_cod &&
-                                          Provider.of<OrderProvider>(context,
-                                                      listen: false)
-                                                  .paymentMethodIndex ==
-                                              0) {
-                                        Provider.of<OrderProvider>(context, listen: false)
-                                            .placeOrder(
-                                                OrderPlaceModel(
-                                                  CustomerInfo(
-                                                      Provider.of<ProfileProvider>(context, listen: false)
-                                                          .addressList[Provider.of<OrderProvider>(context, listen: false)
-                                                              .addressIndex]
+                                                  .discount !=
+                                              null
+                                          ? Provider.of<CouponProvider>(context,
+                                                  listen: false)
+                                              .coupon
+                                              .code
+                                          : '';
+                                  if (_cod &&
+                                      Provider.of<OrderProvider>(context,
+                                                  listen: false)
+                                              .paymentMethodIndex ==
+                                          0) {
+                                    Provider.of<OrderProvider>(context, listen: false)
+                                        .placeOrder(
+                                            OrderPlaceModel(
+                                              CustomerInfo(
+                                                  Provider.of<ProfileProvider>(context, listen: false)
+                                                      .addressList[Provider.of<OrderProvider>(context, listen: false)
+                                                          .addressIndex]
+                                                      .id
+                                                      .toString(),
+                                                  Provider.of<ProfileProvider>(context, listen: false)
+                                                      .addressList[Provider.of<OrderProvider>(context, listen: false)
+                                                          .addressIndex]
+                                                      .address,
+                                                  _billingAddress
+                                                      ? Provider.of<ProfileProvider>(context, listen: false)
+                                                          .billingAddressList[
+                                                              Provider.of<OrderProvider>(context, listen: false)
+                                                                  .billingAddressIndex]
                                                           .id
-                                                          .toString(),
-                                                      Provider.of<ProfileProvider>(context, listen: false)
+                                                          .toString()
+                                                      : Provider.of<ProfileProvider>(context, listen: false)
                                                           .addressList[
                                                               Provider.of<OrderProvider>(context, listen: false)
                                                                   .addressIndex]
-                                                          .address,
-                                                      _billingAddress
-                                                          ? Provider.of<ProfileProvider>(context, listen: false)
-                                                              .billingAddressList[
-                                                                  Provider.of<OrderProvider>(context, listen: false)
-                                                                      .billingAddressIndex]
-                                                              .id
-                                                              .toString()
-                                                          : Provider.of<ProfileProvider>(context, listen: false)
-                                                              .addressList[Provider.of<OrderProvider>(context, listen: false)
-                                                                  .addressIndex]
-                                                              .id
-                                                              .toString(),
-                                                      _billingAddress
-                                                          ? Provider.of<ProfileProvider>(context, listen: false)
-                                                              .billingAddressList[Provider.of<OrderProvider>(context, listen: false).billingAddressIndex]
-                                                              .address
-                                                          : Provider.of<ProfileProvider>(context, listen: false).addressList[Provider.of<OrderProvider>(context, listen: false).addressIndex].address,
-                                                      orderNote),
-                                                  _cartList,
-                                                  order.paymentMethodIndex == 0
-                                                      ? 'cash_on_delivery'
-                                                      : '',
-                                                  couponDiscount,
-                                                ),
-                                                _callback,
-                                                _cartList,
-                                                Provider.of<ProfileProvider>(context, listen: false)
-                                                    .addressList[
+                                                          .id
+                                                          .toString(),
+                                                  _billingAddress
+                                                      ? Provider.of<ProfileProvider>(context, listen: false)
+                                                          .billingAddressList[Provider.of<OrderProvider>(context, listen: false).billingAddressIndex]
+                                                          .address
+                                                      : Provider.of<ProfileProvider>(context, listen: false).addressList[Provider.of<OrderProvider>(context, listen: false).addressIndex].address,
+                                                  orderNote),
+                                              _cartList,
+                                              order.paymentMethodIndex == 0
+                                                  ? 'cash_on_delivery'
+                                                  : '',
+                                              couponDiscount,
+                                            ),
+                                            _callback,
+                                            _cartList,
+                                            Provider.of<ProfileProvider>(context, listen: false)
+                                                .addressList[
+                                                    Provider.of<OrderProvider>(context,
+                                                            listen: false)
+                                                        .addressIndex]
+                                                .id
+                                                .toString(),
+                                            couponCode,
+                                            _billingAddress
+                                                ? Provider.of<ProfileProvider>(context,
+                                                        listen: false)
+                                                    .billingAddressList[
                                                         Provider.of<OrderProvider>(
                                                                 context,
                                                                 listen: false)
-                                                            .addressIndex]
+                                                            .billingAddressIndex]
+                                                    .id
+                                                    .toString()
+                                                : Provider.of<ProfileProvider>(context,
+                                                        listen: false)
+                                                    .addressList[Provider.of<OrderProvider>(context, listen: false).addressIndex]
                                                     .id
                                                     .toString(),
-                                                couponCode,
-                                                _billingAddress
-                                                    ? Provider.of<ProfileProvider>(
-                                                            context,
-                                                            listen: false)
-                                                        .billingAddressList[
-                                                            Provider.of<OrderProvider>(context, listen: false)
-                                                                .billingAddressIndex]
-                                                        .id
-                                                        .toString()
-                                                    : Provider.of<ProfileProvider>(
-                                                            context,
-                                                            listen: false)
-                                                        .addressList[Provider.of<OrderProvider>(context, listen: false).addressIndex]
-                                                        .id
-                                                        .toString(),
-                                                orderNote,
-                                                context);
-                                      } else {
-                                        String userID =
-                                            await Provider.of<ProfileProvider>(
-                                                    context,
-                                                    listen: false)
-                                                .getUserInfo(context);
-                                        Navigator.pushReplacement(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (_) => PaymentScreen(
-                                                      customerID: userID,
-                                                      addressID: Provider.of<
-                                                                  ProfileProvider>(
+                                            orderNote,
+                                            context);
+                                  } else {
+                                    String userID =
+                                        await Provider.of<ProfileProvider>(
+                                                context,
+                                                listen: false)
+                                            .getUserInfo(context);
+                                    Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (_) => PaymentScreen(
+                                                  customerID: userID,
+                                                  addressID: Provider.of<
+                                                              ProfileProvider>(
+                                                          context,
+                                                          listen: false)
+                                                      .addressList[Provider.of<
+                                                                  OrderProvider>(
                                                               context,
                                                               listen: false)
-                                                          .addressList[Provider
-                                                                  .of<OrderProvider>(
-                                                                      context,
-                                                                      listen:
-                                                                          false)
-                                                              .addressIndex]
-                                                          .id
-                                                          .toString(),
-                                                      couponCode: Provider.of<
-                                                                          CouponProvider>(
+                                                          .addressIndex]
+                                                      .id
+                                                      .toString(),
+                                                  couponCode:
+                                                      Provider.of<CouponProvider>(
                                                                       context,
                                                                       listen:
                                                                           false)
@@ -335,33 +318,44 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                                               .coupon
                                                               .code
                                                           : '',
-                                                      billingId: _billingAddress
-                                                          ? Provider.of<ProfileProvider>(
-                                                                  context,
-                                                                  listen: false)
-                                                              .billingAddressList[
-                                                                  Provider.of<OrderProvider>(
-                                                                          context,
-                                                                          listen:
-                                                                              false)
-                                                                      .billingAddressIndex]
-                                                              .id
-                                                              .toString()
-                                                          : Provider.of<ProfileProvider>(
-                                                                  context,
-                                                                  listen: false)
-                                                              .addressList[Provider.of<OrderProvider>(
+                                                  billingId: _billingAddress
+                                                      ? Provider.of<ProfileProvider>(
+                                                              context,
+                                                              listen: false)
+                                                          .billingAddressList[
+                                                              Provider.of<OrderProvider>(
+                                                                      context,
+                                                                      listen:
+                                                                          false)
+                                                                  .billingAddressIndex]
+                                                          .id
+                                                          .toString()
+                                                      : Provider.of<ProfileProvider>(
+                                                              context,
+                                                              listen: false)
+                                                          .addressList[
+                                                              Provider.of<OrderProvider>(
                                                                       context,
                                                                       listen:
                                                                           false)
                                                                   .addressIndex]
-                                                              .id
-                                                              .toString(),
-                                                      orderNote: orderNote,
-                                                    )));
-                                      }
-                                    }
-                                  },
+                                                          .id
+                                                          .toString(),
+                                                  orderNote: orderNote,
+                                                )));
+                                  }
+                                }
+                              },
+                              child: Container(
+                                height: 80,
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: Dimensions.PADDING_SIZE_LARGE,
+                                    vertical: Dimensions.PADDING_SIZE_DEFAULT),
+                                decoration: BoxDecoration(
+                                  color: ColorResources.getPrimary(context),
+                                  borderRadius:BorderRadius.only(topLeft: Radius.circular(15),topRight: Radius.circular(15))
+                                ),
+                                child: Center(
                                   child: Text(getTranslated('proceed', context),
                                       style: titilliumSemiBold.copyWith(
                                         fontSize:
@@ -369,18 +363,29 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                         color: Theme.of(context).cardColor,
                                       )),
                                 ),
-                              )
-                            : Container(
-                                height: 30,
-                                width: 30,
-                                alignment: Alignment.center,
-                                child: CircularProgressIndicator(
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                        Theme.of(context).highlightColor)),
-                              );
-                      },
-                    ),
-                  ),
+                              ),
+                            ),
+                          )
+                        : Container(
+                            height: 30,
+                            width: 30,
+                            alignment: Alignment.center,
+                            child: CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                    Theme.of(context).highlightColor)),
+                          );
+                  },
+
+                  // child: Container(
+                  //   height: 60,
+                  //   padding: EdgeInsets.symmetric(
+                  //       horizontal: Dimensions.PADDING_SIZE_LARGE,
+                  //       vertical: Dimensions.PADDING_SIZE_DEFAULT),
+                  //   decoration: BoxDecoration(
+                  //     color: ColorResources.getPrimary(context),
+                  //   ),
+
+                  // ),
                 ),
                 body: Column(
                   children: [
